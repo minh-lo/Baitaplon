@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1715252341 source:c:\users\binh dan\onedrive - vnu.edu.vn\máy tính\festivalcoming\tictactoe\main.cpp
+	<iostream>
+	<SDL.h>
+	<SDL_image.h>
+	"graphic.h"
+	"defs.h"
+	"logic.h"
+
+1715247560 c:\users\binh dan\onedrive - vnu.edu.vn\máy tính\festivalcoming\tictactoe\graphic.h
+	<SDL.h>
+	<SDL_image.h>
+	"defs.h"
+	"logic.h"
+
+1715247903 c:\users\binh dan\onedrive - vnu.edu.vn\máy tính\festivalcoming\tictactoe\defs.h
+
+1715252341 c:\users\binh dan\onedrive - vnu.edu.vn\máy tính\festivalcoming\tictactoe\logic.h
+
