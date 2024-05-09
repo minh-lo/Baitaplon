@@ -2,97 +2,86 @@
 Them duoc:
 - Khong danh trung o
 - Co logic thang thua
--
+- Danh duoc nhieu vong
 
 
 
 
 */
 
+#include <iostream>
+#include <SDL.h>
+#include <SDL_image.h>
+#include "graphic.h"
+#include "defs.h"
+#include "logic.h"
 
+using namespace std;
 
-
-
-#ifndef LOGIC_H
-#define LOGIC_H
-
-#define BOARD_SIZE 3
-#define EMPTY_CELL ' '
-#define O_CELL 'o'
-#define X_CELL 'x'
-
-enum GameState {
-    IN_PROGRESS,
-    PLAYER_O_WON,
-    PLAYER_X_WON,
-    DRAW
-};
-
-struct Tictactoe {
-    char board[BOARD_SIZE][BOARD_SIZE];
-    char nextMove = O_CELL;
-    GameState gameState = IN_PROGRESS;
-
-    void init() {
-        for (int i = 0; i < BOARD_SIZE; i++)
-            for (int j = 0; j < BOARD_SIZE; j++) board[i][j] = EMPTY_CELL;
-        gameState = IN_PROGRESS;
+void waitUntilKeyPressed()
+{
+    SDL_Event e;
+    while (true) {
+        if ( SDL_PollEvent(&e) != 0 &&
+             (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
+            return;
+        SDL_Delay(100);
     }
+}
 
-    bool isCellMarked(int row, int column) {
-        return board[row][column] != EMPTY_CELL;
+void processClick(int x, int y, Tictactoe& game, Graphics& graphics) {
+    int clickedCol = (x - BOARD_X) / CELL_SIZE;
+    int clickedRow = (y - BOARD_Y) / CELL_SIZE;
+    if (!game.isCellMarked(clickedRow, clickedCol)) {
+        game.move(clickedRow, clickedCol);
+        graphics.render(game);
+        game.displayResult();
     }
+}
 
-    void move(int row, int column) {
-        if (row >= 0 && row < BOARD_SIZE && column >= 0 && column < BOARD_SIZE && !isCellMarked(row, column))
-        {
-            board[row][column] = nextMove;
-            nextMove = (nextMove == O_CELL) ? X_CELL : O_CELL;
-            gameState = checkGameState();
-        }
-    }
+int main(int argc, char *argv[])
+{
+    Graphics graphics;
+    graphics.init();
 
-    GameState checkGameState() {
-        for (int row = 0; row < BOARD_SIZE; ++row) {
-            if (board[row][0] != EMPTY_CELL &&
-                board[row][0] == board[row][1] &&
-                board[row][0] == board[row][2]) {
-                return (board[row][0] == O_CELL) ? PLAYER_O_WON : PLAYER_X_WON;
+    Tictactoe game;
+    bool playAgain = true;
+    char choice;
+
+    while (playAgain) {
+        game.init();
+        graphics.render(game);
+
+        int x, y;
+        SDL_Event event;
+        bool quit = false;
+        while (!quit) {
+            SDL_PollEvent(&event);
+            switch (event.type) {
+                case SDL_QUIT:
+                     quit = true;
+                     playAgain = false;
+                     break;
+                case SDL_MOUSEBUTTONDOWN:
+                     SDL_GetMouseState(&x, &y);
+                     processClick(x, y, game, graphics);
+                     if (game.gameState != IN_PROGRESS) {
+                         game.displayResult();
+                         waitUntilKeyPressed();
+                         quit = true;
+                     }
+                     break;
             }
+            SDL_Delay(100);
         }
-        for (int col = 0; col < BOARD_SIZE; ++col) {
-            if (board[0][col] != EMPTY_CELL &&
-                board[0][col] == board[1][col] &&
-                board[0][col] == board[2][col]) {
-                return (board[0][col] == O_CELL) ? PLAYER_O_WON : PLAYER_X_WON;
-            }
-        }
-        if (board[0][0] != EMPTY_CELL &&
-            board[0][0] == board[1][1] &&
-            board[0][0] == board[2][2]) {
-            return (board[0][0] == O_CELL) ? PLAYER_O_WON : PLAYER_X_WON;
-        }
-        if (board[0][2] != EMPTY_CELL &&
-            board[0][2] == board[1][1] &&
-            board[0][2] == board[2][0]) {
-            return (board[0][2] == O_CELL) ? PLAYER_O_WON : PLAYER_X_WON;
-        }
-        for (int i = 0; i < BOARD_SIZE; i++)
-            for (int j = 0; j < BOARD_SIZE; j++)
-                if (board[i][j] == EMPTY_CELL)
-                    return IN_PROGRESS;
 
-        return DRAW;
-    }
-    void displayResult() {
-        if (gameState == PLAYER_O_WON) {
-            std::cout << "Player O won!" << std::endl;
-        } else if (gameState == PLAYER_X_WON) {
-            std::cout << "Player X won!" << std::endl;
-        } else if (gameState == DRAW) {
-            std::cout << "It's a draw!" << std::endl;
+        if (playAgain) {
+            cout << "Choi lai (y/n): ";
+            cin >> choice;
+            playAgain = (choice == 'y');
         }
     }
-};
 
-#endif // LOGIC_H
+    graphics.quit();
+    return 0;
+}
