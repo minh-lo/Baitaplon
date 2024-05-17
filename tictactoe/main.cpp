@@ -1,3 +1,14 @@
+/*
+Them duoc:
+- Khong danh trung o
+- Co logic thang thua
+- Danh duoc nhieu vong
+
+
+
+
+*/
+
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
